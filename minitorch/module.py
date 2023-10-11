@@ -32,12 +32,19 @@ class Module:
     def train(self) -> None:
         "Set the mode of this module and all descendent modules to `train`."
         # TODO: Implement for Task 0.4.
-        raise NotImplementedError('Need to implement for Task 0.4')
+        self.training = True
+        if len(self._modules)>1:
+            for name in self._modules:
+                self._modules[name].training=True
+        # raise NotImplementedError('Need to implement for Task 0.4')
 
     def eval(self) -> None:
         "Set the mode of this module and all descendent modules to `eval`."
         # TODO: Implement for Task 0.4.
-        raise NotImplementedError('Need to implement for Task 0.4')
+        self.training = False
+        if len(self._modules)>1:
+            for name in self._modules:
+                self._modules[name].training = False
 
     def named_parameters(self) -> Sequence[Tuple[str, Parameter]]:
         """
@@ -48,12 +55,31 @@ class Module:
             The name and `Parameter` of each ancestor parameter.
         """
         # TODO: Implement for Task 0.4.
-        raise NotImplementedError('Need to implement for Task 0.4')
+        if len(self._modules)==0:
+            new_Parameter_dict = {}
+            for p in self._parameters:
+               new_Parameter_dict[p] = self._parameters[p]
+            return new_Parameter_dict
+        else:
+            Parameter_dict = {}
+            for key in self._parameters:
+                Parameter_dict[key] = self._parameters[key]
+            for modules_name in self._modules:
+                child_dic = self._modules[modules_name].named_parameters()
+                for child_key in child_dic:
+                    Parameter_dict[modules_name+"."+child_key]=child_dic[child_key]
+            return Parameter_dict
+        
+        # raise NotImplementedError('Need to implement for Task 0.4')
 
     def parameters(self) -> Sequence[Parameter]:
         "Enumerate over all the parameters of this module and its descendents."
         # TODO: Implement for Task 0.4.
-        raise NotImplementedError('Need to implement for Task 0.4')
+        res_dict = self.named_parameters()
+        m: Dict[str, Module] = self.__dict__["_modules"]
+        t: Dict[str, Parameter] = res_dict
+        return list(t.values())
+        # raise NotImplementedError('Need to implement for Task 0.4')
 
     def add_parameter(self, k: str, v: Any) -> Parameter:
         """
