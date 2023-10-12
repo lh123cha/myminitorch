@@ -34,12 +34,12 @@ def neg(x: float) -> float:
 def lt(x: float, y: float) -> float:
     "$f(x) =$ 1.0 if x is less than y else 0.0"
     # TODO: Implement for Task 0.1.
-    return x<y
+    return float(x<y)
 
 def eq(x: float, y: float) -> float:
     "$f(x) =$ 1.0 if x is equal to y else 0.0"
     # TODO: Implement for Task 0.1.
-    return x==y
+    return float(x==y)
 
 
 def max(x: float, y: float) -> float:

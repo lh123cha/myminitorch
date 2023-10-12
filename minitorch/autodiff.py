@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Any, Iterable, List, Tuple
+import queue
 
 from typing_extensions import Protocol
 
@@ -30,8 +31,6 @@ def central_difference(f: Any, *vals: Any, arg: int = 0, epsilon: float = 1e-6) 
     args[arg] -= 2*epsilon
     f2 = f(*args)
     return (f1-f2)/(2*epsilon)
-    
-    # raise NotImplementedError('Need to implement for Task 1.1')
 
 
 variable_count = 1
@@ -70,6 +69,32 @@ def topological_sort(variable: Variable) -> Iterable[Variable]:
         Non-constant Variables in topological order starting from the right.
     """
     # TODO: Implement for Task 1.4.
+    q = queue.Queue()
+    q.put(variable)
+    #对计算图拓扑排序
+    Visited = []
+    res = []
+    def visit(variable: Variable):
+        id = variable.unique_id()
+        if variable.is_leaf():
+            pass
+        if id not in Visited:
+            Visited.append(id)
+    q.put(variable)
+    res.append(variable)
+    visit(variable)
+    while not q.empty():
+        temp = q.get()
+        for t in temp.parents():
+            q.put(t)
+            visit(t)
+            res.append(t)
+    return res
+            
+    
+
+
+
     raise NotImplementedError('Need to implement for Task 1.4')
 
 
