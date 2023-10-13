@@ -70,31 +70,23 @@ def topological_sort(variable: Variable) -> Iterable[Variable]:
     """
     # TODO: Implement for Task 1.4.
     q = queue.Queue()
-    q.put(variable)
-    #对计算图拓扑排序
-    Visited = []
     res = []
-    def visit(variable: Variable):
-        id = variable.unique_id()
-        if variable.is_leaf():
-            pass
-        if id not in Visited:
-            Visited.append(id)
+    Visited = []
     q.put(variable)
-    res.append(variable)
-    visit(variable)
+    Visited.append(variable.unique_id)
+    res.insert(0,variable)
     while not q.empty():
         temp = q.get()
-        for t in temp.parents():
-            q.put(t)
-            visit(t)
-            res.append(t)
+        if temp.is_constant():
+            break
+        if temp.unique_id in Visited:
+            break
+        if not temp.is_leaf():
+            for t in temp.parents:
+                q.put(t)
+        Visited.append(temp.unique_id)
+        res.insert(0,temp)
     return res
-            
-    
-
-
-
     raise NotImplementedError('Need to implement for Task 1.4')
 
 
@@ -110,6 +102,27 @@ def backpropagate(variable: Variable, deriv: Any) -> None:
     No return. Should write to its results to the derivative values of each leaf through `accumulate_derivative`.
     """
     # TODO: Implement for Task 1.4.
+    compute_graph = topological_sort(variable=variable)
+    node_to_grad = {}
+    node_to_grad[variable.unique_id]=deriv
+    #获得计算图
+    for node in compute_graph:
+        if node.is_leaf():
+            continue
+        if node.unique_id in node_to_grad.keys():
+            grade = node_to_grad[node.unique_id]
+        #获得Variable v_i的inputs
+        inputs = node.chain_rule(grade)
+        for var,item in inputs:
+            #backward()就相当于是v_i*\frac{\partial v_i}{\partial v_k}
+            if var.is_leaf():
+                var.accumulate_derivative(item)
+            if var.unique_id in node_to_grad.keys():
+                #append v_ki to node_to_grad[k]
+                node_to_grad[var.unique_id] +=item
+            else:
+                node_to_grad[var.unique_id] = item
+
     raise NotImplementedError('Need to implement for Task 1.4')
 
 
