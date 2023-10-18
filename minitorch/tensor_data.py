@@ -45,8 +45,8 @@ def index_to_position(index: Index, strides: Strides) -> int:
 
     # TODO: Implement for Task 2.1.
     pos = 0
-    for stride in strides:
-        pos+=index[i]*strides[i]
+    for i,val in enumerate(index):
+        pos += val*strides[i]
     return pos
     # raise NotImplementedError('Need to implement for Task 2.1')
 
@@ -122,6 +122,9 @@ def strides_from_shape(shape: UserShape) -> UserStrides:
 
 
 class TensorData:
+    # strides是tuple用户使用tensor时的strides
+    #_strides是tensor内置的strides。
+    #shape同理
     _storage: Storage
     _strides: Strides
     _shape: Shape
@@ -236,13 +239,11 @@ class TensorData:
 
         # TODO: Implement for Task 2.1.
         #permute操作将stride和shape都进行重排列
-        new_shape = Shape
-        new_stride = Strides
-        for i in range(len(self.shape)):
-            new_shape = self._shape[order[i]]
-            new_stride = self._strides[order[i]]
-        self._shape = new_shape
-        self._strides = new_stride
+        return TensorData(
+            storage=self._storage,
+            shape=tuple([self.shape[i] for i in order]),
+            strides= tuple([self.strides[i] for i in order])            
+        )
 
     def to_string(self) -> str:
         s = ""
