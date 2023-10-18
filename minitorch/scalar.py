@@ -107,7 +107,7 @@ class Scalar:
         return LT.apply(b,self)    
     def __eq__(self, b: ScalarLike) -> Scalar:  # type: ignore[override]
         # TODO: Implement for Task 1.2.
-        return EQ.apply(self,float(b))
+        return EQ.apply(self,b)
         # raise NotImplementedError('Need to implement for Task 1.2')
 
     def __sub__(self, b: ScalarLike) -> Scalar:
@@ -178,10 +178,12 @@ class Scalar:
         assert h.last_fn is not None
         assert h.ctx is not None
         # TODO: Implement for Task 1.3.
+        #grads是一个tuple
         grads = h.last_fn._backward(h.ctx,d_output)
+        #将inputs输入变量与其对应的梯度组成一个tuple
         return zip(h.inputs,grads)
         
-        raise NotImplementedError('Need to implement for Task 1.3')
+        # raise NotImplementedError('Need to implement for Task 1.3')
 
     def backward(self, d_output: Optional[float] = None) -> None:
         """

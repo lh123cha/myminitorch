@@ -69,25 +69,41 @@ def topological_sort(variable: Variable) -> Iterable[Variable]:
         Non-constant Variables in topological order starting from the right.
     """
     # TODO: Implement for Task 1.4.
-    q = queue.Queue()
-    res = []
     Visited = []
-    q.put(variable)
-    Visited.append(variable.unique_id)
-    res.insert(0,variable)
-    while not q.empty():
-        temp = q.get()
-        if temp.is_constant():
-            break
-        if temp.unique_id in Visited:
-            break
-        if not temp.is_leaf():
-            for t in temp.parents:
-                q.put(t)
-        Visited.append(temp.unique_id)
-        res.insert(0,temp)
-    return res
-    raise NotImplementedError('Need to implement for Task 1.4')
+    result = []
+
+    def visit(n: Variable):
+        if n.is_constant():
+            return
+        if n.unique_id in Visited:
+            return
+        if not n.is_leaf():
+            for input in n.history.inputs:
+                visit(input)
+        Visited.append(n.unique_id)
+        result.insert(0, n)
+
+    visit(variable)
+    return result
+    # q = queue.Queue()
+    # res = []
+    # Visited = []
+    # q.put(variable)
+    # Visited.append(variable.unique_id)
+    # res.insert(0,variable)
+    # while not q.empty():
+    #     temp = q.get()
+    #     if temp.is_constant():
+    #         break
+    #     if temp.unique_id in Visited:
+    #         break
+    #     if not temp.is_leaf():
+    #         for t in temp.parents:
+    #             q.put(t)
+    #     Visited.append(temp.unique_id)
+    #     res.insert(0,temp)
+    # return res
+    # raise NotImplementedError('Need to implement for Task 1.4')
 
 
 def backpropagate(variable: Variable, deriv: Any) -> None:
@@ -117,13 +133,12 @@ def backpropagate(variable: Variable, deriv: Any) -> None:
             #backward()就相当于是v_i*\frac{\partial v_i}{\partial v_k}
             if var.is_leaf():
                 var.accumulate_derivative(item)
+                continue
             if var.unique_id in node_to_grad.keys():
                 #append v_ki to node_to_grad[k]
                 node_to_grad[var.unique_id] +=item
             else:
                 node_to_grad[var.unique_id] = item
-
-    raise NotImplementedError('Need to implement for Task 1.4')
 
 
 @dataclass
