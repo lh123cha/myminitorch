@@ -91,7 +91,14 @@ def broadcast_index(
         None
     """
     # TODO: Implement for Task 2.2.
-    raise NotImplementedError('Need to implement for Task 2.2')
+    #计算在small tensor中的对应在big tensor中的big_index对应的small index
+    #因为在broadcast时big tensor在big index位置上的元素需要找到对应
+    #的small tensor中small index位置上的元素进行计算。
+    #该函数的作用是计算对应的samll index。
+    for i in range(len(shape)):
+        offset = i + len(big_shape)-len(shape)
+        out_index[i] = big_index[offset] if shape[i] !=1 else 0
+    #raise NotImplementedError('Need to implement for Task 2.2')
 
 
 def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
@@ -109,7 +116,19 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
         IndexingError : if cannot broadcast
     """
     # TODO: Implement for Task 2.2.
-    raise NotImplementedError('Need to implement for Task 2.2')
+    l = max(len(shape1),len(shape2))
+    new_shape = []
+    if len(shape1)>len(shape2):
+        shape2 = [1 for i in range(l-len(shape2))]+(list(shape2))
+    else:
+        shape1 = [1 for i in range(l-len(shape1))]+(list(shape1))
+    for i in range(l):
+        if shape1[i] != shape2[i] and shape1[i] != 1 and shape2[i] != 1:
+            raise IndexingError("cannot broadcast")
+    for i in range(l):
+        new_shape.append(max(shape1[i],shape2[i]))
+        # new_shape[i] = max(shape1[i],shape2[i])
+    return tuple(new_shape)
 
 
 def strides_from_shape(shape: UserShape) -> UserStrides:
