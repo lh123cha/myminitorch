@@ -232,7 +232,7 @@ class Permute(Function):
         (a,ls) = ctx.saved_values
         p1 = []
         for i in range(len(ls)):
-            p1.append(p1.index(i))
+            p1.append(ls.index(i))
         grad_output = minitorch.Tensor(grad_output._tensor.permute(*p1),backend=a.backend)
         return grad_output,0
 

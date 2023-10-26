@@ -34,12 +34,12 @@ def neg(x: float) -> float:
 def lt(x: float, y: float) -> float:
     "$f(x) =$ 1.0 if x is less than y else 0.0"
     # TODO: Implement for Task 0.1.
-    return float(x<y)
+    return 1.0 if x<y else  0.0
 
 def eq(x: float, y: float) -> float:
     "$f(x) =$ 1.0 if x is equal to y else 0.0"
     # TODO: Implement for Task 0.1.
-    return float(x==y)
+    return 1.0 if x==y else 0.0
 
 
 def max(x: float, y: float) -> float:
@@ -68,9 +68,9 @@ def sigmoid(x: float) -> float:
     """
     fx = 0
     if x>=0:
-        fx = 1/(1+exp(-x))
+        fx = 1.0/(1.0+math.exp(-x))
     else:
-        fx = exp(x)/(1+exp(x))
+        fx = math.exp(x)/(1+math.exp(x))
     return fx
 
 

@@ -66,10 +66,11 @@ def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
     """
     # TODO: Implement for Task 2.1.
 
-    for i in range(len(shape)-1,-1,-1):
-        out_index[i] = ordinal %shape[i]
-        ordinal = ordinal //shape[i]
-    return out_index
+    cur_pos = ordinal + 0
+    for i in range(len(shape) - 1, -1, -1):
+        sh = shape[i]
+        out_index[i] = int(cur_pos % sh)
+        cur_pos = cur_pos // sh
 
 def broadcast_index(
     big_index: Index, big_shape: Shape, shape: Shape, out_index: OutIndex

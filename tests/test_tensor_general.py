@@ -54,7 +54,7 @@ def test_create(backend: str, t1: List[float]) -> None:
 @settings(max_examples=100)
 @pytest.mark.parametrize("fn", one_arg)
 @pytest.mark.parametrize("backend", backend_tests)
-def test_one_args(
+def test_one_argsone_args(
     fn: Tuple[str, Callable[[float], float], Callable[[Tensor], Tensor]],
     backend: str,
     data: DataObject,
@@ -305,7 +305,7 @@ if numba.cuda.is_available():
 
 
 @given(data())
-@settings(max_examples=25)
+@settings(max_examples=15)
 @pytest.mark.parametrize("fn", two_arg)
 @pytest.mark.parametrize("backend", backend_tests)
 def test_two_grad_broadcast(

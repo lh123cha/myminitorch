@@ -112,5 +112,5 @@ if __name__ == "__main__":
     PTS = 50
     HIDDEN = 2
     RATE = 0.5
-    data = minitorch.datasets["Diag"](PTS)
+    data = minitorch.datasets["Split"](PTS)
     ScalarTrain(HIDDEN).train(data, RATE)
