@@ -65,6 +65,9 @@ def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
 
     """
     # TODO: Implement for Task 2.1.
+    if len(shape) == 1:
+        out_index[0] = ordinal
+        return
 
     cur_pos = ordinal + 0
     for i in range(len(shape) - 1, -1, -1):

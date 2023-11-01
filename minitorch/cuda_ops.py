@@ -355,12 +355,23 @@ def _mm_practice(out: Storage, a: Storage, b: Storage, size: int) -> None:
     """
     BLOCK_DIM = 32
     # TODO: Implement for Task 3.3.
-    i= cuda.blockIdx.x*cuda.blockDim.x + cuda.threadIdx.x
-    out_index = cuda.local.array(((size,size)),numba.int32)
-    
+    tx = cuda.blockIdx.x*cuda.blockDim.x+cuda.threadIdx.x
+    ty = cuda.blockIdx.y*cuda.blockDim.y + cuda.threadIdx.y
 
-    
-    raise NotImplementedError('Need to implement for Task 3.3')
+
+    a_share = cuda.shared.array((BLOCK_DIM,BLOCK_DIM),numba.float64)
+    b_share = cuda.shared.array((BLOCK_DIM,BLOCK_DIM),numba.float64)
+    if tx<size and ty<size:
+        a_share[tx,ty] = a[tx * size + ty]
+        b_share[tx,ty] = b[tx * size + ty]
+    cuda.syncthreads()
+
+    if tx<size and ty<size:
+        c = 0
+        for k in range(size):
+            c += a_share[tx,k]*b_share[k,ty]
+        out[tx * size + ty] = c
+
 
 
 jit_mm_practice = cuda.jit()(_mm_practice)
@@ -417,6 +428,7 @@ def _tensor_matrix_multiply(
     b_shared = cuda.shared.array((BLOCK_DIM, BLOCK_DIM), numba.float64)
 
     # The final position c[i, j]
+    #固定线程(i,j)
     i = cuda.blockIdx.x * cuda.blockDim.x + cuda.threadIdx.x
     j = cuda.blockIdx.y * cuda.blockDim.y + cuda.threadIdx.y
 
@@ -424,13 +436,49 @@ def _tensor_matrix_multiply(
     pi = cuda.threadIdx.x
     pj = cuda.threadIdx.y
 
+    MAX_BLOCKS = a_shape[2]
+
+    acc = 0
+
     # Code Plan:
     # 1) Move across shared dimension by block dim.
     #    a) Copy into shared memory for a matrix.
     #    b) Copy into shared memory for b matrix
     #    c) Compute the dot produce for position c[i, j]
     # TODO: Implement for Task 3.4.
-    raise NotImplementedError('Need to implement for Task 3.4')
+
+    # 1) Move across shared dimension by block dim.
+    #对每一个线程(i,j)循环blcok
+    #对于a矩阵pi不变，pj变大，按行增长
+    #对于b矩阵pj不变，pi变大，按列增长
+    for s in range(0,a_shape[2],BLOCK_DIM):
+        pj_offset = pj + s
+        pi_offset = pi + s
+        
+        #a) Copy into shared memory for a matrix
+        if i< a_shape[1] and pj_offset < a_shape[2]:
+            a_offset = a_batch_stride*batch + a_strides[1]*i+a_strides[2]*pj_offset
+            a_shared[pi,pj] = a_storage[a_offset]
+
+        #b) Copy into shared memory for b matrix
+        if j<b_shape[1] and pi_offset < b_shape[2]:
+            b_offset = b_batch_stride*batch+b_strides[1]*pi_offset+b_strides[2]*j
+            b_shared[pi,pj] = b_storage[b_offset]
+        cuda.syncthreads()
+
+        #得到的共享内存矩阵进行乘积，得到一块内(i,j)位置上的乘积
+        #将多块(i,j)位置上的乘积求和
+        for k in range(BLOCK_DIM):
+            if k+s<a_shape[2]:
+                acc += a_shared[pi,k]*b_shared[k,pj]
+        cuda.syncthreads()
+    
+    # c) Compute the dot produce for position c[i,j]
+    # calculate the position of out
+    if i<out_shape[1] and j<out_shape[2]:
+        out_offset = out_strides[0]*batch+out_strides[1]*i+out_strides[2]*j
+        out[out_offset] = acc
+
 
 
 tensor_matrix_multiply = cuda.jit(_tensor_matrix_multiply)
